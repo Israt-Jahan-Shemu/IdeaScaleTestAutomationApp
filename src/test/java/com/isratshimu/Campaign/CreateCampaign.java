@@ -12,6 +12,7 @@ import java.util.ArrayList;
 public class CreateCampaign extends TestBase {
     public static final String campaignName = "Campaign By IsratJahanShemu";
     public static final String ideaTitle = "Idea of IsratJahanShemu";
+    public static final String BASE_URL = "https://trialqa.ideascale.com/";
 
     public static void main(String args[]) {
         launchWebBrowser();
@@ -20,13 +21,13 @@ public class CreateCampaign extends TestBase {
 
     public static void openCampaign() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(35));
-        driver.get("https://trialqa.ideascale.com/");
+        driver.get(BASE_URL);
 
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
         /*Accept Cookies*/
         driver.findElement(By.xpath("/html/body/div[3]/div/div/div[2]/div[1]/div/div[2]/button[2]")).click();
 
-        driver.get("https://trialqa.ideascale.com/");
+        driver.get(BASE_URL);
 
         WebElement Email = driver.findElement(By.id("login-email"));
         Email.sendKeys("trialqa.ideascale@gmail.com");
@@ -100,25 +101,22 @@ public class CreateCampaign extends TestBase {
 //        submitButtonElement.click();
 
 
-    /**
-     * Upvote
-     */
-            driver.get("https://trialqa.ideascale.com/a/idea?templateId=0");
+        /**
+         * Upvote
+         */
+        driver.get("https://trialqa.ideascale.com/a/idea?templateId=0");
 
-            wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.xpath("//*[@id=\"official-header-row\"]/div/div/nav/div/a[2]")))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.xpath("//*[@id=\"official-header-row\"]/div/div/nav/div/a[2]")))).click();
 
-            String href = driver.findElement(By.xpath("//*[@id=\"main-content\"]/div/div/div[2]/article[12]/header/h2/a")).getAttribute("href");
-            String[] array = href.split("/");
-            String id = array[array.length - 1].split("\\-")[0];
+        String href = driver.findElement(By.xpath("/html/body/div[5]/div[1]/div[2]/div/div/div[2]/article[7]/header/h2/a")).getAttribute("href");
+        driver.get(href);
 
-            driver.get("https://trialqa.ideascale.com/a/dtd/" + array[array.length - 2] + "/" + array[array.length - 1]);
-    // wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.xpath("//a[@title='Idea of IsratJahanShemu']")))).click();
+        // wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.xpath("//a[@title='Idea of IsratJahanShemu']")))).click();
+        // wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.xpath("//a[@title='You have voted']")))).click();
 
-    // wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.xpath("//a[@title='You have voted']")))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.xpath("//*[@id=\"comment-text\"]")))).sendKeys("Nice Idea");
 
-            wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.xpath("//*[@id=\"comment-text\"]")))).sendKeys("Nice Idea");
-
-            wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.xpath("/html/body/div[5]/div[1]/div[1]/div/article/div[7]/div/div/section[1]/div/div/form/div[5]/input")))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.xpath("/html/body/div[5]/div[1]/div[1]/div/article/div[7]/div/div/section[1]/div/div/form/div[5]/input")))).click();
     }
 
 }
