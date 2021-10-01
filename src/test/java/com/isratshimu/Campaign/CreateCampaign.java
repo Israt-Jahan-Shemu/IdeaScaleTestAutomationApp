@@ -2,6 +2,7 @@ package com.isratshimu.Campaign;
 
 import com.isratshimu.Base.TestBase;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -24,36 +25,41 @@ public class CreateCampaign extends TestBase {
 
     @AfterMethod
     public void tearDown() {
-//        closeBrowser();
+        closeBrowser();
     }
 
     @Test
-    public static void createCampaign() {
+    public static void Test1CreateCampaign() {
         login();
         createNewCampaign();
     }
 
     @Test
-    public static void createIdea() {
+    public static void Test2CreateIdea() {
         login();
-        createNewCampaign();
         createNewIdea();
     }
 
     @Test
-    public static void upvoteTheIdea() {
+    public static void Test3UpvoteTheIdea() {
         login();
-        createNewCampaign();
-        createNewIdea();
-        upvoteAndCommentOnIdea();
+        upvoteOnIdea();
+    }
+
+    @Test
+    public static void Test4CommentOnTheIdea() {
+        login();
+        commentOnIdea();
     }
 
     public static void login() {
         driver.get(BASE_URL);
 
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(15));
+
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
         /*Accept Cookies*/
-        driver.findElement(By.cssSelector("button[class='btn btn-primary flex-fill json-link']")).click();
+        wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.cssSelector("button[class='btn btn-primary flex-fill json-link']")))).click();
         driver.get(BASE_URL);
 
         WebElement Email = driver.findElement(By.id("login-email"));
@@ -63,7 +69,6 @@ public class CreateCampaign extends TestBase {
         Password.sendKeys("a@123456#");
 
         WebElement LoginBtn = driver.findElement(By.cssSelector("button[class='btn btn-xl btn-primary btn-block ga-tracker disabled-when-loading btn-captcha'"));
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(200));
         LoginBtn.click();
     }
 
@@ -89,11 +94,8 @@ public class CreateCampaign extends TestBase {
 
         /*Click Add New Campaign*/
         By campaign = By.xpath("/html/body/div[5]/div[1]/div/section/div[2]/div[1]/a[2]");
-        WebDriverWait waitForCampaign = new WebDriverWait(driver, Duration.ofSeconds(25));
-        WebElement campaignElement = waitForCampaign.until(ExpectedConditions.elementToBeClickable(campaign));
+        WebElement campaignElement = wait.until(ExpectedConditions.elementToBeClickable(campaign));
         campaignElement.click();
-//        waitForCampaign.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.xpath("/html/body/div[5]/div[1]/div/section/div[2]/div[1]/a[2]")))).click();
-
 
         /*Provide Campaign Name*/
         WebElement Name = driver.findElement(By.id("category-name-field"));
@@ -114,13 +116,11 @@ public class CreateCampaign extends TestBase {
     }
 
     public static void createNewIdea() {
-        /*Get all the current tabs open*/
-        ArrayList<String> tabs = new ArrayList<String>(driver.getWindowHandles());
-        driver.switchTo().window(tabs.get(1));
-
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(35));
 
-        driver.switchTo().window(tabs.get(0));
+        /* wait for the home page to be fully loaded */
+        wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.id("topbar-avatar"))));
+
         driver.get("https://trialqa.ideascale.com/a/idea?templateId=0");
 
         /*Submit your Idea*/
@@ -130,36 +130,62 @@ public class CreateCampaign extends TestBase {
 
         /*Select Campaign*/
         driver.findElement(By.id("select2-idea-campaign-value-container")).click();
-        wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.xpath("//li[contains(text(),'" + campaignName + "')]")))).click();
+        wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.xpath("//li[contains(text(),'" +campaignName+ "')]")))).click();
 
         /*Set Description*/
-//        WebElement Description = driver.findElement(By.id("idea-desc-value"));
-//        Description.sendKeys("Idea of Israt Jahan Shemu ");
-        wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.id("idea-desc-value")))).click();
+        WebElement Description = wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.id("idea-desc-value"))));
+        Description.sendKeys("Idea of Israt Jahan Shemu ");
+
+        /* to perform Scroll on application using Selenium */
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("window.scrollBy(0,350)", "");
 
         /*Submit Form*/
-//        WebElement submitButtonElement = wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.xpath("//button[contains(text(),'Submit')]"))));
-//        submitButtonElement.click();
+        WebElement submitButtonElement = wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.xpath("//button[contains(text(),'Submit')]"))));
+        submitButtonElement.click();
 
     }
 
-    public static void upvoteAndCommentOnIdea() {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(35));
-        /**
-         * Upvote
-         */
-        driver.get("https://trialqa.ideascale.com/a/idea?templateId=0");
+    public static void upvoteOnIdea() {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        /* wait for the home page to be fully loaded */
+        wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.id("topbar-avatar"))));
 
+        /* click on IDEAS menu */
         wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.xpath("//*[@id=\"official-header-row\"]/div/div/nav/div/a[2]")))).click();
 
         String href = driver.findElement(By.xpath("/html/body/div[5]/div[1]/div[2]/div/div/div[2]/article[7]/header/h2/a")).getAttribute("href");
         driver.get(href);
 
-        // wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.xpath("//a[@title='Idea of IsratJahanShemu']")))).click();
-        // wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.xpath("//a[@title='You have voted']")))).click();
+        /* upvote the idea */
+        try{
+            wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.cssSelector("a[class='vote-up json-link idea-voted']")))).click();
+        }catch (Exception e){
+            wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.cssSelector("a[class='vote-up json-link']")))).click();
+        }
+    }
 
-        wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.xpath("//*[@id=\"comment-text\"]")))).sendKeys("Nice Idea");
+    public static void commentOnIdea() {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+        /* wait for the home page to be fully loaded */
+        wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.id("topbar-avatar"))));
 
-        wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.xpath("/html/body/div[5]/div[1]/div[1]/div/article/div[7]/div/div/section[1]/div/div/form/div[5]/input")))).click();
+        /* click on IDEAS menu */
+        wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.xpath("//*[@id=\"official-header-row\"]/div/div/nav/div/a[2]")))).click();
+
+        String href = driver.findElement(By.xpath("/html/body/div[5]/div[1]/div[2]/div/div/div[2]/article[7]/header/h2/a")).getAttribute("href");
+        driver.get(href);
+
+        /* write comment in the comment box */
+        wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.id("comment-text")))).sendKeys("Nice Idea");
+
+        /* to perform Scroll on application using Selenium */
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript("window.scrollBy(0,450)", "");
+
+        /* click on the comment box */
+        wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.id("comment-text")))).click();
+        /* submit comment by clicking the Submit Comment button */
+        wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.cssSelector("input[class='btn btn-lg btn-primary disabled-when-loading']")))).click();
     }
 }
