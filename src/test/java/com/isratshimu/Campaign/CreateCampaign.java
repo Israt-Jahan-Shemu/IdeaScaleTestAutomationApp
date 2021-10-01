@@ -5,6 +5,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Test;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -14,19 +17,43 @@ public class CreateCampaign extends TestBase {
     public static final String ideaTitle = "Idea of IsratJahanShemu";
     public static final String BASE_URL = "https://trialqa.ideascale.com/";
 
-    public static void main(String args[]) {
+    @BeforeMethod
+    public void initSetUp() {
         launchWebBrowser();
-        openCampaign();
     }
 
-    public static void openCampaign() {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(35));
+    @AfterMethod
+    public void tearDown() {
+//        closeBrowser();
+    }
+
+    @Test
+    public static void createCampaign() {
+        login();
+        createNewCampaign();
+    }
+
+    @Test
+    public static void createIdea() {
+        login();
+        createNewCampaign();
+        createNewIdea();
+    }
+
+    @Test
+    public static void upvoteTheIdea() {
+        login();
+        createNewCampaign();
+        createNewIdea();
+        upvoteAndCommentOnIdea();
+    }
+
+    public static void login() {
         driver.get(BASE_URL);
 
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
         /*Accept Cookies*/
-        driver.findElement(By.xpath("/html/body/div[3]/div/div/div[2]/div[1]/div/div[2]/button[2]")).click();
-
+        driver.findElement(By.cssSelector("button[class='btn btn-primary flex-fill json-link']")).click();
         driver.get(BASE_URL);
 
         WebElement Email = driver.findElement(By.id("login-email"));
@@ -35,8 +62,13 @@ public class CreateCampaign extends TestBase {
         WebElement Password = driver.findElement(By.id("login-password"));
         Password.sendKeys("a@123456#");
 
-        WebElement LoginBtn = driver.findElement(By.xpath("/html/body/div[5]/section/div/div/form/div[4]/button"));
+        WebElement LoginBtn = driver.findElement(By.cssSelector("button[class='btn btn-xl btn-primary btn-block ga-tracker disabled-when-loading btn-captcha'"));
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(200));
         LoginBtn.click();
+    }
+
+    public static void createNewCampaign() {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(35));
 
         /*Click Trial QA Dropdown*/
         wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.id("topbar-avatar")))).click();
@@ -60,6 +92,7 @@ public class CreateCampaign extends TestBase {
         WebDriverWait waitForCampaign = new WebDriverWait(driver, Duration.ofSeconds(25));
         WebElement campaignElement = waitForCampaign.until(ExpectedConditions.elementToBeClickable(campaign));
         campaignElement.click();
+//        waitForCampaign.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.xpath("/html/body/div[5]/div[1]/div/section/div[2]/div[1]/a[2]")))).click();
 
 
         /*Provide Campaign Name*/
@@ -78,6 +111,14 @@ public class CreateCampaign extends TestBase {
         driver.findElement(By.xpath("//*[@id=\"campaign-form\"]/div/div[2]/section[1]/div[2]/div[2]/button")).click();
         /*Back to Home*/
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(20));
+    }
+
+    public static void createNewIdea() {
+        /*Get all the current tabs open*/
+        ArrayList<String> tabs = new ArrayList<String>(driver.getWindowHandles());
+        driver.switchTo().window(tabs.get(1));
+
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(35));
 
         driver.switchTo().window(tabs.get(0));
         driver.get("https://trialqa.ideascale.com/a/idea?templateId=0");
@@ -100,7 +141,10 @@ public class CreateCampaign extends TestBase {
 //        WebElement submitButtonElement = wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.xpath("//button[contains(text(),'Submit')]"))));
 //        submitButtonElement.click();
 
+    }
 
+    public static void upvoteAndCommentOnIdea() {
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(35));
         /**
          * Upvote
          */
@@ -118,5 +162,4 @@ public class CreateCampaign extends TestBase {
 
         wait.until(ExpectedConditions.elementToBeClickable(driver.findElement(By.xpath("/html/body/div[5]/div[1]/div[1]/div/article/div[7]/div/div/section[1]/div/div/form/div[5]/input")))).click();
     }
-
 }
